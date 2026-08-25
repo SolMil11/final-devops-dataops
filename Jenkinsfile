@@ -1,31 +1,37 @@
 pipeline {
     agent any
     stages {
-        stage('Validar Python') {
+        stage('1. Validar Entorno') {
             steps {
                 bat 'python --version'
-            }
-        }
-        stage('Instalar dependencias') {
-            steps {
                 bat 'pip install pandas'
             }
         }
-        stage('Ejecucion Extraccion Raw') {
+        stage('2. Inicializacion') {
             steps {
-                echo 'Generando las 50 ordenes de compra para CIPSA...'
+                bat 'python initialize.py'
+            }
+        }
+        stage('3. Extraccion Raw') {
+            steps {
                 bat 'python extract.py'
             }
         }
-        stage('Ejecucion Transformacion Silver') {
+        stage('4. Perfilamiento y Calidad') {
             steps {
-                echo 'Procesando y clasificando ordenes de compra...'
+                bat 'python profile.py'
+                bat 'python quality.py'
+            }
+        }
+        stage('5. Transformacion Silver') {
+            steps {
                 bat 'python transform.py'
             }
         }
-        stage('Validacion final') {
+        stage('6. Publicacion Gold y Metricas') {
             steps {
-                echo 'Pipeline ejecutado correctamente para CIPSA CIPTECH'
+                bat 'python publish.py'
+                bat 'python metrics.py'
             }
         }
     }
